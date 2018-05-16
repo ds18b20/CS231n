@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 # This is a bit of magic to make matplotlib figures appear inline in the notebook
 # rather than in a new window.
 # get_ipython().magic('matplotlib inline')
-plt.rcParams['figure.figsize'] = (10.0, 8.0)  # set default size of plots
+plt.rcParams['figure.figsize'] = (10.0, 8.0) # set default size of plots
 plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
 
@@ -91,6 +91,13 @@ y_test = y_test[mask]
 # Reshape the image data into rows
 X_train = np.reshape(X_train, (X_train.shape[0], -1))
 X_test = np.reshape(X_test, (X_test.shape[0], -1))
+
+# X_train = (X_train - np.mean(X_train, axis=1).reshape(-1, 1))
+# X_test = (X_test - np.mean(X_test, axis=1).reshape(-1, 1))
+
+# X_train = (X_train - np.mean(X_train, axis=1).reshape(-1, 1))/np.std(X_train, axis=1, ddof=1).reshape(-1, 1)
+# X_test = (X_test - np.mean(X_test, axis=1).reshape(-1, 1))/np.std(X_test, axis=1, ddof=1).reshape(-1, 1)
+
 print(X_train.shape, X_test.shape)
 
 
@@ -157,19 +164,16 @@ Test labels shape:  (10000,)
 (500, 3072) (50, 3072)
 (50, 500)
 Got 5 / 50 correct => accuracy: 0.100000
-Got 69 / 500 correct => accuracy: 0.138000
+Got 137 / 500 correct => accuracy: 0.274000
 """
 # You should expect to see approximately `27%` accuracy. Now lets try out a larger `k`, say `k = 5`:
 
-# In[ ]:
-
-'''
 y_test_pred = classifier.predict_labels(dists, k=5)
 num_correct = np.sum(y_test_pred == y_test)
 accuracy = float(num_correct) / num_test
 print('Got %d / %d correct => accuracy: %f' % (num_correct, num_test, accuracy))
 
-
+'''
 # You should expect to see a slightly better performance than with `k = 1`.
 
 # **Inline Question 2**
@@ -184,7 +188,18 @@ print('Got %d / %d correct => accuracy: %f' % (num_correct, num_test, accuracy))
 # 
 # *Your explanation*:
 # 
+Standard:
+Got 13 / 50 correct => accuracy: 0.260000
+Got 7 / 50 correct => accuracy: 0.140000
 
+array-mean:
+Got 11 / 50 correct => accuracy: 0.220000
+Got 5 / 50 correct => accuracy: 0.100000
+
+(array-mean)/std
+Got 15 / 50 correct => accuracy: 0.300000
+Got 12 / 50 correct => accuracy: 0.240000
+'''
 
 
 # Now lets speed up distance matrix computation by using partial vectorization
@@ -204,9 +219,19 @@ if difference < 0.001:
     print('Good! The distance matrices are the same')
 else:
     print('Uh-oh! The distance matrices are different')
+'''
+Training data shape:  (50000, 32, 32, 3)
+Training labels shape:  (50000,)
+Test data shape:  (10000, 32, 32, 3)
+Test labels shape:  (10000,)
+(500, 3072) (50, 3072)
+(50, 500)
+Got 13 / 50 correct => accuracy: 0.260000
+Got 7 / 50 correct => accuracy: 0.140000
+Difference was: 0.000000
+Good! The distance matrices are the same
+'''
 
-
-# In[ ]:
 
 
 # Now implement the fully vectorized version inside compute_distances_no_loops
@@ -221,10 +246,7 @@ if difference < 0.001:
 else:
     print('Uh-oh! The distance matrices are different')
 
-
-# In[ ]:
-
-
+'''
 # Let's compare how fast the implementations are
 def time_function(f, *args):
     """
