@@ -74,6 +74,11 @@ class KNearestNeighbor(object):
         # dists[i][j] = (((X[i]-self.X_train[j])**2).sum())**(0.5)
         # dists[i][j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
         dists[i][j] = np.sqrt(np.sum((X[i]-self.X_train[j])**2))
+        
+        '''(x-y)**2 is seperated
+        sum_square = np.sum(X[i]**2, axis=-1) + np.sum(self.X_train[j]**2, axis=-1) - 2 * np.sum(X[i] * self.X_train[j], axis=-1)
+        dists[i][j] = np.sqrt(sum_square)
+        '''
         #####################################################################
         #                       END OF YOUR CODE                            #
         #####################################################################
@@ -96,6 +101,11 @@ class KNearestNeighbor(object):
       #######################################################################
       # dists[i] = np.sqrt(np.sum(np.square(X[i] - self.X_train), axis=1))
       dists[i] = np.sqrt(np.sum((X[i] - self.X_train)**2, axis=1))
+      
+      '''(x-y)**2 is seperated
+      sum_square = np.sum(X[i]**2, axis=-1) + np.sum(self.X_train**2, axis=-1) - 2 * np.sum(X[i] * self.X_train, axis=-1)
+      dists[i] = np.sqrt(sum_square)
+      '''
       #######################################################################
       #                         END OF YOUR CODE                            #
       #######################################################################
@@ -122,12 +132,27 @@ class KNearestNeighbor(object):
     # HINT: Try to formulate the l2 distance using matrix multiplication    #
     #       and two broadcast sums.                                         #
     #########################################################################
+    '''MemoryError!!!
     X = X.reshape(num_test, 1, -1)
     substract = X - self.X_train
     square = substract**2
     su = np.sum(square, axis=-1)
     dists = np.sqrt(su)
     # dists = np.sqrt(np.sum((X.reshape(num_test, 1, -1) - self.X_train)**2, axis=-1))
+    '''
+    batch_size = 10
+    for i in range(int(num_test/batch_size)):
+        start = i * batch_size
+        end = (i + 1) * batch_size
+        dists[start:end] = np.sqrt(np.sum((X[start:end].reshape(batch_size, 1, -1) - self.X_train)**2, axis=-1))
+    
+    '''(x-y)**2 is seperated
+    X = X.reshape(num_test, 1, -1)
+    # substract = X - self.X_train  # 500*5000*32*32*3*4(int32)=30,720,000,000
+    sum_square = np.sum(X**2, axis=-1) + np.sum(self.X_train**2, axis=-1) - 2 * np.sum(X * self.X_train, axis=-1)
+
+    dists = np.sqrt(sum_square)
+    '''
     #########################################################################
     #                         END OF YOUR CODE                              #
     #########################################################################

@@ -76,14 +76,14 @@ for y, cls in enumerate(classes):
 plt.show()
 '''
 # Subsample the data for more efficient code execution in this exercise
-num_training = 5000
-# num_training = 500
+# num_training = 5000
+num_training = 500
 mask = list(range(num_training))
 X_train = X_train[mask]
 y_train = y_train[mask]
 
-num_test = 500
-# num_test = 50
+# num_test = 500
+num_test = 50
 mask = list(range(num_test))
 X_test = X_test[mask]
 y_test = y_test[mask]
@@ -98,7 +98,8 @@ X_test = np.reshape(X_test, (X_test.shape[0], -1))
 # X_train = (X_train - np.mean(X_train, axis=1).reshape(-1, 1))/np.std(X_train, axis=1, ddof=1).reshape(-1, 1)
 # X_test = (X_test - np.mean(X_test, axis=1).reshape(-1, 1))/np.std(X_test, axis=1, ddof=1).reshape(-1, 1)
 
-print(X_train.shape, X_test.shape)
+print('X_train', X_train.shape, 'dtype={}'.format(X_train.dtype))
+print('X_test', X_test.shape, 'dtype={}'.format(X_test.dtype))
 
 
 from cs231n.classifiers import KNearestNeighbor
@@ -233,7 +234,6 @@ Good! The distance matrices are the same
 '''
 
 
-
 # Now implement the fully vectorized version inside compute_distances_no_loops
 # and run the code
 dists_two = classifier.compute_distances_no_loops(X_test)
@@ -245,6 +245,10 @@ if difference < 0.001:
     print('Good! The distance matrices are the same')
 else:
     print('Uh-oh! The distance matrices are different')
+'''
+Difference was: 0.000000
+Good! The distance matrices are the same
+'''
 
 '''
 # Let's compare how fast the implementations are
