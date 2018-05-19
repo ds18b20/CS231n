@@ -39,7 +39,17 @@ def load_CIFAR10(ROOT):
   Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
   return Xtr, Ytr, Xte, Yte
 
-
+def load_CIFAR10_batch_one(ROOT):
+  """ load batch one of cifar """
+  f = os.path.join(ROOT, 'data_batch_%d' % (1, ))
+  X, Y = load_CIFAR_batch(f)
+  
+  Xtr = X
+  Ytr = Y
+  del X, Y
+  Xte, Yte = load_CIFAR_batch(os.path.join(ROOT, 'test_batch'))
+  return Xtr, Ytr, Xte, Yte
+  
 def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000,
                      subtract_mean=True):
     """

@@ -71,14 +71,9 @@ class KNearestNeighbor(object):
         # training point, and store the result in dists[i, j]. You should   #
         # not use a loop over dimension.                                    #
         #####################################################################
-        # dists[i][j] = (((X[i]-self.X_train[j])**2).sum())**(0.5)
-        # dists[i][j] = np.sqrt(np.sum(np.square(X[i]-self.X_train[j])))
-        dists[i][j] = np.sqrt(np.sum((X[i]-self.X_train[j])**2))
-        
-        '''(x-y)**2 is seperated
-        sum_square = np.sum(X[i]**2, axis=-1) + np.sum(self.X_train[j]**2, axis=-1) - 2 * np.sum(X[i] * self.X_train[j], axis=-1)
-        dists[i][j] = np.sqrt(sum_square)
-        '''
+        # dists[i][j] = np.sqrt(np.sum((X[i]-self.X_train[j])**2))
+        dists[i,j] = np.sum(X[i]**2 + self.X_train[j]**2 - 2*X[i]*self.X_train[j])
+        # dists[i][j] = np.sqrt(sum_square)
         #####################################################################
         #                       END OF YOUR CODE                            #
         #####################################################################
@@ -99,13 +94,13 @@ class KNearestNeighbor(object):
       # Compute the l2 distance between the ith test point and all training #
       # points, and store the result in dists[i, :].                        #
       #######################################################################
-      # dists[i] = np.sqrt(np.sum(np.square(X[i] - self.X_train), axis=1))
-      dists[i] = np.sqrt(np.sum((X[i] - self.X_train)**2, axis=1))
+      # dists[i] = np.sqrt(np.sum((X[i] - self.X_train)**2, axis=1))
+      X_test_squ_array = np.sum(X[i]**2)
+      X_train_squ_array = np.sum(self.X_train**2, axis = 1)
+      x_te_tr = np.dot(X[i], self.X_train.T)
       
-      '''(x-y)**2 is seperated
-      sum_square = np.sum(X[i]**2, axis=-1) + np.sum(self.X_train**2, axis=-1) - 2 * np.sum(X[i] * self.X_train, axis=-1)
-      dists[i] = np.sqrt(sum_square)
-      '''
+      dists[i] = X_test_squ_array + X_train_squ_array - 2 * x_te_tr
+      # dists[i] = np.sqrt(sum_square)
       #######################################################################
       #                         END OF YOUR CODE                            #
       #######################################################################
@@ -140,19 +135,28 @@ class KNearestNeighbor(object):
     dists = np.sqrt(su)
     # dists = np.sqrt(np.sum((X.reshape(num_test, 1, -1) - self.X_train)**2, axis=-1))
     '''
-    batch_size = 10
+    
+    '''batch_size = 10
     for i in range(int(num_test/batch_size)):
         start = i * batch_size
         end = (i + 1) * batch_size
         dists[start:end] = np.sqrt(np.sum((X[start:end].reshape(batch_size, 1, -1) - self.X_train)**2, axis=-1))
+    '''
     
     '''(x-y)**2 is seperated
     X = X.reshape(num_test, 1, -1)
     # substract = X - self.X_train  # 500*5000*32*32*3*4(int32)=30,720,000,000
-    sum_square = np.sum(X**2, axis=-1) + np.sum(self.X_train**2, axis=-1) - 2 * np.sum(X * self.X_train, axis=-1)
-
-    dists = np.sqrt(sum_square)
+    sun_x = np.sum(X**2, axis=-1)
+    sum_x_train = np.sum(self.X_train**2, axis=-1)
+    # element wise multiplication still takes the most time
+    sum_mul = np.sum(X * self.X_train, axis=-1)
+    sum_square = sun_x + sum_x_train - 2 * sum_mul
     '''
+    X_test_squ_array = np.sum(np.square(X), axis = 1)
+    X_train_squ_array = np.sum(np.square(self.X_train), axis = 1)
+    x_te_tr = np.dot(X, self.X_train.T)
+    dists = X_test_squ_array.reshape(num_test, 1) + X_train_squ_array.reshape(1, num_train) - 2 * x_te_tr
+    # dists = np.sqrt(sum_square)
     #########################################################################
     #                         END OF YOUR CODE                              #
     #########################################################################

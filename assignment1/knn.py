@@ -20,7 +20,7 @@
 
 import random
 import numpy as np
-from cs231n.data_utils import load_CIFAR10
+from cs231n.data_utils import load_CIFAR10, load_CIFAR10_batch_one
 import matplotlib.pyplot as plt
 
 # from __future__ import print_function
@@ -48,7 +48,8 @@ cifar10_dir = 'cs231n/datasets/cifar-10-batches-py'
 # except:
    # pass
 
-X_train, y_train, X_test, y_test = load_CIFAR10(cifar10_dir)
+# X_train, y_train, X_test, y_test = load_CIFAR10(cifar10_dir)
+X_train, y_train, X_test, y_test = load_CIFAR10_batch_one(cifar10_dir)
 
 # As a sanity check, we print out the size of the training and test data.
 print('Training data shape: ', X_train.shape)
@@ -76,14 +77,14 @@ for y, cls in enumerate(classes):
 plt.show()
 '''
 # Subsample the data for more efficient code execution in this exercise
-# num_training = 5000
-num_training = 500
+num_training = 5000
+# num_training = 500
 mask = list(range(num_training))
 X_train = X_train[mask]
 y_train = y_train[mask]
 
-# num_test = 500
-num_test = 50
+num_test = 500
+# num_test = 50
 mask = list(range(num_test))
 X_test = X_test[mask]
 y_test = y_test[mask]
@@ -246,11 +247,22 @@ if difference < 0.001:
 else:
     print('Uh-oh! The distance matrices are different')
 '''
+Training data shape:  (10000, 32, 32, 3)
+Training labels shape:  (10000,)
+Test data shape:  (10000, 32, 32, 3)
+Test labels shape:  (10000,)
+X_train (5000, 3072) dtype=float64
+X_test (500, 3072) dtype=float64
+(500, 5000)
+Got 137 / 500 correct => accuracy: 0.274000
+Got 142 / 500 correct => accuracy: 0.284000
+Difference was: 0.000000
+Good! The distance matrices are the same
 Difference was: 0.000000
 Good! The distance matrices are the same
 '''
 
-'''
+
 # Let's compare how fast the implementations are
 def time_function(f, *args):
     """
@@ -271,6 +283,26 @@ print('One loop version took %f seconds' % one_loop_time)
 no_loop_time = time_function(classifier.compute_distances_no_loops, X_test)
 print('No loop version took %f seconds' % no_loop_time)
 
+'''
+Training data shape:  (10000, 32, 32, 3)
+Training labels shape:  (10000,)
+Test data shape:  (10000, 32, 32, 3)
+Test labels shape:  (10000,)
+X_train (5000, 3072) dtype=float64
+X_test (500, 3072) dtype=float64
+(500, 5000)
+Got 137 / 500 correct => accuracy: 0.274000
+Got 142 / 500 correct => accuracy: 0.284000
+Difference was: 0.000000
+Good! The distance matrices are the same
+Difference was: 0.000000
+Good! The distance matrices are the same
+Two loop version took 46.282000 seconds
+One loop version took 43.715000 seconds
+No loop version took 0.258000 seconds
+'''
+
+'''
 # you should see significantly faster performance with the fully vectorized implementation
 
 
