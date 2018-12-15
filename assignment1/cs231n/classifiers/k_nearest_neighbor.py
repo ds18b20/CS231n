@@ -198,7 +198,7 @@ class KNearestNeighbor(object):
       # Store this label in y_pred[i]. Break ties by choosing the smaller     #
       # label.                                                                #
       #########################################################################
-      y_pred[i] = max(set(closest_y), key=closest_y.count)  # np.ndarray
+      y_pred[i] = max(set(closest_y), key=closest_y.count)  # np.ndarray feed each element of set(closest_y) to closest_y.count(x)
       # y_pred[i] = Counter(closest_y).most_common(1)[0][0]
       
       #########################################################################
