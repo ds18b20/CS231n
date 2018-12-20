@@ -39,7 +39,7 @@ def svm_loss_naive(W, X, y, reg):
         #     + 0
         #     + max(0, x_i1.w_31 + x_i2.w_32 + x_i3.w_33 *** +x_iD.w_3D - x_i1.w_yi1 - x_i2.w_yi2 - x_i3.w_yi3 *** - x_iD.w_yiD)
         dW[:, y[i]] -= X[i, :]
-        dW[:, j] -= X[i, :]
+        dW[:, j] += X[i, :]
 
   # Right now the loss is a sum over all training examples, but we want it
   # to be an average instead so we divide by num_train.
@@ -79,8 +79,9 @@ def svm_loss_vectorized(W, X, y, reg):
   #############################################################################
   scores = X.dot(W)
   yi_scores = scores[np.arange(scores.shape[0]), y]  # http://stackoverflow.com/a/23435843/459241 
-  margins = np.maximum(0, scores - yi_scores.reshape(-1, 1) + 1)
-  margins[np.arange(num_train), y] = 0  # necessary?
+  margins = np.maximum(0, scores - yi_scores.reshape(-1, 1) + 1)  # all score score - correct class score
+  margins[np.arange(num_train), y] = 0  # necessary! correct calss should not to be calculated => 0
+
   loss = np.mean(np.sum(margins, axis=1))
   loss += 0.5 * reg * np.sum(W * W)
   #############################################################################
@@ -99,10 +100,8 @@ def svm_loss_vectorized(W, X, y, reg):
   #############################################################################
   binary = margins
   binary[margins > 0] = 1
-  print(binary[0])
-  print(binary[2])
   row_sum = np.sum(binary, axis=1)
-  print(row_sum)
+  print(row_sum.shape)
   binary[np.arange(num_train), y] = -row_sum.T
   dW = np.dot(X.T, binary)
 
