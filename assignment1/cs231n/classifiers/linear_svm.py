@@ -59,7 +59,6 @@ def svm_loss_naive(W, X, y, reg):
   # code above to compute the gradient.                                       #
   #############################################################################
 
-
   return loss, dW
 
 
@@ -70,20 +69,26 @@ def svm_loss_vectorized(W, X, y, reg):
   Inputs and outputs are the same as svm_loss_naive.
   """
   loss = 0.0
-  dW = np.zeros(W.shape) # initialize the gradient as zero
+  dW = np.zeros(W.shape, dtype=np.float64) # initialize the gradient as zero
   num_train = X.shape[0]
   #############################################################################
   # TODO:                                                                     #
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  scores = X.dot(W)
+  scores = X.dot(W).astype(np.float64)
   yi_scores = scores[np.arange(scores.shape[0]), y]  # http://stackoverflow.com/a/23435843/459241 
   margins = np.maximum(0, scores - yi_scores.reshape(-1, 1) + 1)  # all score score - correct class score
   margins[np.arange(num_train), y] = 0  # necessary! correct calss should not to be calculated => 0
-
-  loss = np.mean(np.sum(margins, axis=1))
-  loss += 0.5 * reg * np.sum(W * W)
+  
+  loss = np.mean(margins)
+  if loss is np.nan:
+    print('loss is nan')
+    print('margins:\n', margins)
+  penalty = 0.5 * reg * np.sum(W**2)
+  if penalty is np.nan:
+    print('penalty is nan')
+  loss += penalty
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -101,7 +106,6 @@ def svm_loss_vectorized(W, X, y, reg):
   binary = margins
   binary[margins > 0] = 1
   row_sum = np.sum(binary, axis=1)
-  print(row_sum.shape)
   binary[np.arange(num_train), y] = -row_sum.T
   dW = np.dot(X.T, binary)
 
@@ -110,8 +114,6 @@ def svm_loss_vectorized(W, X, y, reg):
 
   # Regularize
   dW += reg*W
-
-  return loss, dW
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################

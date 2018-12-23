@@ -5,7 +5,6 @@ from cs231n.classifiers.linear_svm import *
 from cs231n.classifiers.softmax import *
 
 class LinearClassifier(object):
-
   def __init__(self):
     self.W = None
 
@@ -37,37 +36,36 @@ class LinearClassifier(object):
     # Run stochastic gradient descent to optimize W
     loss_history = []
     for it in range(num_iters):
-      X_batch = None
-      y_batch = None
-
       #########################################################################
-      # TODO:                                                                 #
-      # Sample batch_size elements from the training data and their           #
-      # corresponding labels to use in this round of gradient descent.        #
-      # Store the data in X_batch and their corresponding labels in           #
-      # y_batch; after sampling X_batch should have shape (dim, batch_size)   #
-      # and y_batch should have shape (batch_size,)                           #
-      #                                                                       #
-      # Hint: Use np.random.choice to generate indices. Sampling with         #
-      # replacement is faster than sampling without replacement.              #
+      # TODO:                                            #
+      # Sample batch_size elements from the training data and their        #
+      # corresponding labels to use in this round of gradient descent.      #
+      # Store the data in X_batch and their corresponding labels in        #
+      # y_batch; after sampling X_batch should have shape (dim, batch_size)  # shape: (batch_size, dim)
+      # and y_batch should have shape (batch_size,)                  #
+      #                                               #
+      # Hint: Use np.random.choice to generate indices. Sampling with      #
+      # replacement is faster than sampling without replacement.         #
       #########################################################################
-      pass
+      mask = np.random.choice(num_train, batch_size, replace=True)
+      X_batch = X[mask]
+      y_batch = y[mask]
       #########################################################################
-      #                       END OF YOUR CODE                                #
+      #                       END OF YOUR CODE              #
       #########################################################################
 
       # evaluate loss and gradient
-      loss, grad = self.loss(X_batch, y_batch, reg)
+      loss, grad = self.loss(self.W, X_batch, y_batch, reg)
       loss_history.append(loss)
 
       # perform parameter update
       #########################################################################
-      # TODO:                                                                 #
-      # Update the weights using the gradient and the learning rate.          #
+      # TODO:                                            #
+      # Update the weights using the gradient and the learning rate.       #
       #########################################################################
-      pass
+      self.W -= learning_rate*grad
       #########################################################################
-      #                       END OF YOUR CODE                                #
+      #                       END OF YOUR CODE              #
       #########################################################################
 
       if verbose and it % 100 == 0:
@@ -91,12 +89,13 @@ class LinearClassifier(object):
     """
     y_pred = np.zeros(X.shape[0])
     ###########################################################################
-    # TODO:                                                                   #
-    # Implement this method. Store the predicted labels in y_pred.            #
+    # TODO:                                             #
+    # Implement this method. Store the predicted labels in y_pred.        #
     ###########################################################################
-    pass
+    scores = X.dot(self.W)
+    y_pred = np.argmax(scores, axis=1) 
     ###########################################################################
-    #                           END OF YOUR CODE                              #
+    #                           END OF YOUR CODE            #
     ###########################################################################
     return y_pred
   
@@ -120,14 +119,20 @@ class LinearClassifier(object):
 
 class LinearSVM(LinearClassifier):
   """ A subclass that uses the Multiclass SVM loss function """
-
+  def __init__(self):
+    super(LinearSVM, self).__init__()
+    self.loss = svm_loss_vectorized
+  
   def loss(self, X_batch, y_batch, reg):
     return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
 
 
 class Softmax(LinearClassifier):
   """ A subclass that uses the Softmax + Cross-entropy loss function """
-
+  def __init__(self):
+    super(Softmax, self).__init__()
+    self.loss = softmax_loss_vectorized
+  
   def loss(self, X_batch, y_batch, reg):
     return softmax_loss_vectorized(self.W, X_batch, y_batch, reg)
 
